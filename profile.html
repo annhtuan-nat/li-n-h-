@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D QR Connect | Tuan Nguyen</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --instagram: linear-gradient(45deg, #f8ad5c, #802200, #dc2743, #b11151, #bc1888);
+            --facebook: #0a53b2;
+            --zalo: #0068ff;
+            --qr-white: #f6e4e4;
+            --shadow-depth: 15px;
+            --instagram-qr: #b66117;
+            --zalo-qr: #071e2e8a;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(rgba(53, 52, 52, 0.7), rgba(53, 52, 52, 0.7)), 
+                        url('https://scontent.fsgn19-1.fna.fbcdn.net/v/t39.30808-6/482217138_1193242512398478_5916244198794998407_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_ohc=Gkb_9zgQ8NwQ7kNvwGhUyDa&_nc_oc=AdmbH8RKe68HPkhvbojHPRDA_aMl7vJjr3N5j5Yk2JcfhBHU63DPrzyRcR491xAhpsNGXyg7WG_pst2InjYV54nz&_nc_zt=23&_nc_ht=scontent.fsgn19-1.fna&_nc_gid=H9OB4avUgWnNvnhQNl1x1w&oh=00_AfQn1kMooF9btR-C_0sQCP9oroQDDwf0C9qC6Fz7epq-Ww&oe=68744F15') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: rgb(254, 250, 250);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            animation: fadeIn 1s ease-out;
+            background-color: rgba(156, 163, 162, 0.6);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(229, 224, 224, 0.5);
+            margin: 20px 0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            transform-style: preserve-3d;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #050606, #000000);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(23, 1, 1, 0.2);
+            transform: translateZ(30px);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateZ(30px); }
+            50% { transform: translateY(-10px) translateZ(30px); }
+        }
+
+        .subtitle {
+            color: rgba(0, 0, 0, 0.9);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+            transform: translateZ(20px);
+        }
+
+        .social-row {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            perspective: 2000px;
+        }
+
+        .social-card {
+            width: 280px;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: cardEntrance 0.8s ease-out forwards;
+            opacity: 0;
+        }
+
+        .social-card:nth-child(1) { animation-delay: 0.2s; }
+        .social-card:nth-child(2) { animation-delay: 0.4s; }
+        .social-card:nth-child(3) { animation-delay: 0.6s; }
+
+        @keyframes cardEntrance {
+            from { 
+                opacity: 0;
+                transform: translateY(50px) rotateY(30deg);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0) rotateY(0);
+            }
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .social-card:hover .card-inner {
+            transform: rotateY(15deg) rotateX(5deg) translateY(-10px);
+        }
+
+        /* Nền gradient màu logo */
+        .qr-background {
+            position: relative;
+            padding: 3px;
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(252, 249, 249, 0.4);
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateZ(0);
+            animation: pulse 4s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
+            50% { box-shadow: 0 20px 45px rgba(0,0,0,0.5); }
+            100% { box-shadow: 0 15px 35px rgba(0,0,0,0.4); }
+        }
+
+        .instagram .qr-background {
+            background: var(--instagram);
+        }
+
+        .facebook .qr-background {
+            background: var(--facebook);
+        }
+
+        .zalo .qr-background {
+            background: var(--zalo);
+        }
+
+        .social-card:hover .qr-background {
+            transform: scale(1.05) translateZ(10px);
+            box-shadow: 0 25px 50px rgba(247, 236, 236, 0.6);
+        }
+
+        .qr-container {
+            background: var(--qr-white);
+            border-radius: 20px;
+            padding: 25px;
+            position: relative;
+            overflow: hidden;
+            transform: translateZ(20px);
+            box-shadow: 
+                inset 0 0 0 1px rgba(255,255,255,0.2),
+                0 5px 20px rgba(0,0,0,0.2);
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .social-card:hover .qr-container {
+            transform: translateZ(40px);
+        }
+
+        .qr-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                      rgba(255,255,255,0.9) 0%, 
+                      rgba(221, 213, 213, 0.412) 100%);
+            z-index: 1;
+            transition: all 0.6s;
+        }
+
+        .social-card:hover .qr-container::before {
+            opacity: 0.8;
+        }
+
+        .qr-code {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+            position: relative;
+            z-index: 2;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateZ(0);
+        }
+
+        .social-card:hover .qr-code {
+            transform: scale(1.05) translateZ(20px);
+            filter: drop-shadow(0 8px 15px rgba(0,0,0,0.3));
+        }
+
+        /* Logo 3D nổi bật */
+        .qr-logo {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) translateZ(40px);
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 8px 25px rgba(0,0,0,0.4),
+                0 0 0 2px rgba(255,255,255,0.8);
+            z-index: 3;
+            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: logoFloat 4s ease-in-out infinite;
+        }
+
+        @keyframes logoFloat {
+            0%, 100% { transform: translate(-50%, -50%) translateZ(40px) scale(1); }
+            50% { transform: translate(-50%, -55%) translateZ(40px) scale(1.05); }
+        }
+
+        .social-card:hover .qr-logo {
+            transform: translate(-50%, -50%) translateZ(80px) scale(1.2);
+            box-shadow: 
+                0 15px 40px rgba(0,0,0,0.5),
+                0 0 0 3px rgba(255,255,255,0.9);
+            animation: none;
+        }
+
+        .qr-logo::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, 
+                      rgba(255,255,255,0.8) 0%, 
+                      rgba(255,255,255,0) 100%);
+            border-radius: inherit;
+            z-index: -1;
+        }
+
+        .social-icon {
+            font-size: 1.8rem;
+            transition: transform 0.3s;
+        }
+
+        .instagram .social-icon { 
+            background: var(--instagram);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .facebook .social-icon { 
+            color: var(--facebook);
+        }
+
+        .zalo .social-icon { 
+            color: var(--zalo);
+        }
+
+        .social-card:hover .social-icon {
+            transform: rotate(10deg) scale(1.1);
+        }
+
+        .card-footer {
+            text-align: center;
+            padding: 25px 0;
+            transform: translateZ(20px);
+            transition: all 0.4s;
+            color: white;
+        }
+
+        .social-card:hover .card-footer {
+            transform: translateZ(30px);
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .social-card:hover h3 {
+            transform: translateY(-3px);
+            text-shadow: 0 5px 10px rgba(0,0,0,0.3);
+        }
+
+        .social-detail {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            transition: all 0.3s;
+        }
+
+        .social-card:hover .social-detail {
+            transform: translateY(-2px);
+            color: white;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            color: white;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateZ(0);
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            border: none;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(255,255,255,0.3), rgba(255,255,255,0));
+            opacity: 0;
+            transition: opacity 0.4s;
+            z-index: -1;
+        }
+
+        .btn:hover {
+            transform: translateY(-5px) translateZ(10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        }
+
+        .btn:hover::before {
+            opacity: 1;
+        }
+
+        .btn i {
+            margin-right: 10px;
+            transition: transform 0.3s;
+        }
+
+        .btn:hover i {
+            transform: translateX(3px);
+        }
+
+        .btn-instagram { background: var(--instagram); }
+        .btn-facebook { background: var(--facebook); }
+        .btn-zalo { background: var(--zalo); }
+
+        /* Hiệu ứng bong bóng nổi */
+        .bubble {
+            position: absolute;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        @media (max-width: 900px) {
+            .social-row {
+                gap: 30px;
+            }
+            .social-card {
+                width: 240px;
+            }
+            h1 {
+                font-size: 2.4rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                background-attachment: fixed;
+            }
+            .social-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 40px;
+            }
+            .social-card {
+                width: 100%;
+                max-width: 320px;
+            }
+            h1 {
+                font-size: 2.2rem;
+            }
+            header {
+                margin-bottom: 30px;
+            }
+            .container {
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            .subtitle {
+                font-size: 1rem;
+                padding: 0 15px;
+            }
+            .btn {
+                padding: 10px 24px;
+                font-size: 0.9rem;
+            }
+            body {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Kết Nối  Với Annh Tuấn</h1>
+            <p class="subtitle">Quét mã QR 3D hoặc nhấn nút để liên hệ ngay với từng nền tảng.</p>
+        </header>
+        
+        <div class="social-row">
+            <!-- Instagram -->
+            <div class="social-card instagram">
+                <div class="card-inner">
+                    <div class="qr-background">
+                        <div class="qr-container">
+                            <img class="qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://www.instagram.com/n_anh_tuan28/&color=F56040&bgcolor=FFFFFF&qzone=2&margin=12" alt="Instagram QR">
+                            <div class="qr-logo">
+                                <i class="fab fa-instagram social-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <h3>Instagram</h3>
+                        <p class="social-detail">@n_anh_tuan28<br>Theo dõi để xem những khoảnh khắc </p>
+                        <a href="https://www.instagram.com/n_anh_tuan28/" class="btn btn-instagram" target="_blank">
+                            <i class="fab fa-instagram"></i>
+                            Mở Instagram
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Facebook -->
+            <div class="social-card facebook">
+                <div class="card-inner">
+                    <div class="qr-background">
+                        <div class="qr-container">
+                            <img class="qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://www.facebook.com/n.anh.tuan288&color=1877f2&bgcolor=FFFFFF&qzone=2&margin=12" alt="Facebook QR">
+                            <div class="qr-logo">
+                                <i class="fab fa-facebook-f social-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <h3>Facebook</h3>
+                        <p class="social-detail">n.anh.tuan288<br>Kết nối và chia sẻ trên Facebook</p>
+                        <a href="https://www.facebook.com/n.anh.tuan288" class="btn btn-facebook" target="_blank">
+                            <i class="fab fa-facebook-f"></i>
+                            Mở Facebook
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Zalo -->
+            <div class="social-card zalo">
+                <div class="card-inner">
+                    <div class="qr-background">
+                        <div class="qr-container">
+                            <img class="qr-code" src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://zalo.me/0378686206&color=0099FF&bgcolor=FFFFFF&qzone=2&margin=12" alt="Zalo QR">
+                            <div class="qr-logo">
+                                <i class="fas fa-comment-dots social-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <h3>Zalo</h3>
+                        <p class="social-detail">0378 686 206<br>Nhắn tin hoặc gọi điện trực tiếp</p>
+                        <a href="https://zalo.me/0378686206" class="btn btn-zalo" target="_blank">
+                            <i class="fas fa-comment-dots"></i>
+                            Nhắn Zalo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tạo hiệu ứng bong bóng nổi
+        function createBubbles() {
+            const colors = ['rgba(255,255,255,0.1)', 'rgba(255,255,255,0.15)', 'rgba(255,255,255,0.2)'];
+            
+            setInterval(() => {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                
+                // Kích thước ngẫu nhiên
+                const size = Math.random() * 100 + 50;
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                
+                // Vị trí ngẫu nhiên
+                bubble.style.left = `${Math.random() * 100}vw`;
+                bubble.style.top = `${Math.random() * 100}vh`;
+                
+                // Màu sắc ngẫu nhiên
+                bubble.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                // Thêm vào body
+                document.body.appendChild(bubble);
+                
+                // Di chuyển bong bóng
+                const duration = Math.random() * 15 + 10;
+                bubble.style.transition = `all ${duration}s linear`;
+                
+                setTimeout(() => {
+                    bubble.style.transform = `translate(${Math.random() * 200 - 100}px, -100vh)`;
+                    bubble.style.opacity = '0';
+                }, 10);
+                
+                // Xóa bong bóng sau khi di chuyển xong
+                setTimeout(() => {
+                    bubble.remove();
+                }, duration * 1000);
+            }, 1000);
+        }
+        
+        // Kích hoạt hiệu ứng khi trang tải xong
+        window.addEventListener('load', () => {
+            createBubbles();
+            
+            // Hiệu ứng hover card nâng cao
+            const cards = document.querySelectorAll('.social-card');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const x = e.clientX - card.getBoundingClientRect().left;
+                    const y = e.clientY - card.getBoundingClientRect().top;
+                    
+                    const centerX = card.offsetWidth / 2;
+                    const centerY = card.offsetHeight / 2;
+                    
+                    const angleX = (y - centerY) / 20;
+                    const angleY = (centerX - x) / 20;
+                    
+                    card.style.transform = `rotateX(${angleX}deg) rotateY(${angleY}deg)`;
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = 'rotateX(0) rotateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
